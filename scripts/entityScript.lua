@@ -19,7 +19,7 @@ function step(entity, milliseconds)
 	foodCount = entity:getFood();		--library.print("Food..."..foodCount);
 	if (foodCount > 600) then
 		if ( math.random() < SPAWN_CONSTANT ) then
-			spawnEntity( entity:getX(), entity:getY() );
+			-- spawnEntity( entity:getX(), entity:getY() );
 		end
 		
 		entity:setFood(0);

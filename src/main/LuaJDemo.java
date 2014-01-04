@@ -42,12 +42,13 @@ public class LuaJDemo extends BasicGame {
         //Setup scripting engine
 		scr = new ScriptingEngine();
 		scr.loadScript("scripts/entityScript.lua");
-		
+        scr.loadScript("scripts/testing.lua");
+
+        //Test
+        scr.asdf();
+
 		//Add one entity to the stage
 		stage = new Stage();
-		stage.addEntity(
-			new Entity()
-		);
 		
 		//Initialize sample elements to zero
 		samples = new double[numRows][numColumns];
@@ -79,11 +80,13 @@ public class LuaJDemo extends BasicGame {
 			col++;
 			if (col + 1 > numColumns) col = 0;
 		}
-		
+
 		//Now, detect keyboard entry for continuous spawning
         Input input = gc.getInput();
         if (input.isKeyDown(Input.KEY_Z)) {
-        	scr.spawnRandomEntity();
+
+            Entity e = new Entity(500, 200);
+            stage.addEntity(e);
         }
 
 	}
@@ -153,7 +156,8 @@ public class LuaJDemo extends BasicGame {
     public void keyPressed(int key, char c) {
     	if (key == Input.KEY_X)
     	{
-    		scr.spawnRandomEntity();
+    		Entity e = new Entity(500, 200);
+            stage.addEntity(e);
     	}
     	if (key == Input.KEY_C)
     	{

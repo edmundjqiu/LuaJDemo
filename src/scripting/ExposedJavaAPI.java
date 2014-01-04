@@ -1,9 +1,12 @@
 package scripting;
 
+import org.luaj.vm2.LuaThread;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.*;
 import main.LuaJDemo;
 import entities.*;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 public class ExposedJavaAPI extends TwoArgFunction {
 
@@ -27,6 +30,20 @@ public class ExposedJavaAPI extends TwoArgFunction {
     {
     	public LuaValue call(LuaValue newX, LuaValue newY) {
     		Entity e = new Entity(newX.todouble(), newY.todouble());
+            //What differentiates this test is that we're having it controlled by a
+            //LuaThread coroutine script.
+            LuaThread coroutine = LuaJDemo.scr.createCoroutine("update");
+
+            Varargs args = LuaValue.varargsOf(
+                    new LuaValue[]{
+                            CoerceJavaToLua.coerce(e),
+                            CoerceJavaToLua.coerce(coroutine)
+                    }
+            );
+
+            coroutine.resume(args);
+
+
             LuaJDemo.stage.addEntity(e);
             
             return LuaValue.valueOf(0);

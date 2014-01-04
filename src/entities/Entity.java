@@ -1,5 +1,11 @@
 package entities;
 
+import main.LuaJDemo;
+import org.luaj.vm2.LuaThread;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
+import scripting.ScriptingEngine;
+
 public class Entity {
 	
 	private double xCoordinate;
@@ -7,6 +13,10 @@ public class Entity {
 	private double xVelocity;
 	private double yVelocity;
 	private double food;
+
+    private boolean moving = false;
+    private LuaThread coroutine;
+    private int imsorry = 0;
 	
 	public Entity()
 	{
@@ -82,5 +92,39 @@ public class Entity {
 	{
 		this.food = food;
 	}
+
+    public void move(LuaThread coroutine)
+    {
+        this.coroutine = coroutine;
+        moving = true;
+        ScriptingEngine._G.checkglobals().yield(LuaValue.varargsOf(new LuaValue[] {coroutine}));
+    }
+
+    public void update(int milliseconds)
+    {
+
+        if (moving)
+        {
+            LuaJDemo.scr.stepEntity(this, milliseconds);
+            imsorry++;
+        }
+
+        imsorry++;
+
+        //Around 10 seconds
+        if (imsorry > 50)
+        {
+            moving = false;
+            imsorry = 0;
+            coroutine.resume(
+                LuaValue.varargsOf(
+                    new LuaValue[] {
+                        CoerceJavaToLua.coerce(this),
+                        coroutine
+                    }
+                )
+            );
+        }
+    }
 
 }

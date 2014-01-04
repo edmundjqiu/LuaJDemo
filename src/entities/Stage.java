@@ -4,11 +4,16 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Stack;
 
+import org.luaj.vm2.LuaThread;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Color;
 
 import main.LuaJDemo;
+import scripting.ScriptingEngine;
 
 public class Stage
 {
@@ -39,11 +44,8 @@ public class Stage
 			
 			if (replication)
 			{
-				LuaJDemo.scr.stepEntity(currentEntity, time);
-			}
-			else
-			{
-				LuaJDemo.scr.stepWithoutReplication(currentEntity, time);
+				//LuaJDemo.scr.stepEntity(currentEntity, time);
+                currentEntity.update(time);
 			}
 		}
 		
@@ -71,7 +73,21 @@ public class Stage
 	public void addEntity(Entity e)
 	{
 		newEntities.add(e);
-	}
+
+        //What differentiates this test is that we're having it controlled by a
+        //LuaThread coroutine script.
+        LuaThread coroutine = LuaJDemo.scr.createCoroutine("update");
+
+        Varargs args = LuaValue.varargsOf(
+                new LuaValue[]{
+                        CoerceJavaToLua.coerce(e),
+                        CoerceJavaToLua.coerce(coroutine)
+                }
+        );
+
+        coroutine.resume(args);
+
+    }
 	
 	public void clearEntities()
 	{
